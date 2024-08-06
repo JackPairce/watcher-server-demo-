@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import { Servers } from "../storage";
+import { clientIp } from "../utils/ip";
 
 const router = Router();
 
@@ -12,7 +13,7 @@ router.post("/register", (req: any, res: any) => {
     res.status(400).send("Missing hostname");
     return;
   }
-  const public_ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const public_ip = clientIp(req);
   let response = servers.addServer(
     hostname,
     public_ip,
@@ -33,7 +34,7 @@ router.post("/update", (req: any, res: any) => {
     res.status(400).send("Missing hostname");
     return;
   }
-  const public_ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
+  const public_ip = clientIp(req);
   const server = servers.getServer(hostname);
   if (server) {
     servers.updateServer(hostname, public_ip, 1, Date.now().valueOf());
